@@ -85,12 +85,21 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          アカウントをお持ちでない方は{' '}
-          <Link href="/register" className="text-pink-500 font-medium hover:underline">
-            新規登録
+        {/* パスワードを忘れた */}
+        <p className="text-center text-sm mt-4">
+          <Link href="/forgot-password" className="text-gray-400 hover:text-pink-400 transition">
+            パスワードをお忘れの方はこちら
           </Link>
         </p>
+
+        <div className="border-t border-gray-100 mt-4 pt-4">
+          <p className="text-center text-sm text-gray-500">
+            アカウントをお持ちでない方は{' '}
+            <Link href="/register" className="text-pink-500 font-medium hover:underline">
+              新規登録
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
