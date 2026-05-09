@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
     })
 
     if (error) {
-      setError('送信に失敗しました。メールアドレスを確認してください。')
+      setError(`エラー: ${error.message}`)
     } else {
       setSent(true)
     }
