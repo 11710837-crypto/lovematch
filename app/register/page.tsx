@@ -40,14 +40,24 @@ export default function RegisterPage() {
     // アカウント作成
     const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
 
-    if (signUpError || !data.user) {
-      setError('登録に失敗しました。メールアドレスが既に使われている可能性があります。')
+    if (signUpError) {
+      if (signUpError.message?.includes('already registered') || signUpError.message?.includes('already been registered')) {
+        setError('このメールアドレスは既に登録されています。ログインページからログインしてください。')
+      } else {
+        setError(`登録に失敗しました: ${signUpError.message}`)
+      }
+      setLoading(false)
+      return
+    }
+
+    if (!data.user) {
+      setError('登録に失敗しました。もう一度お試しください。')
       setLoading(false)
       return
     }
 
     // プロフィール作成
-    const { error: profileError } = await supabase.from('profiles').insert({
+    await supabase.from('profiles').insert({
       id: data.user.id,
       name,
       age: parseInt(age),
@@ -56,8 +66,9 @@ export default function RegisterPage() {
       is_profile_complete: true,
     })
 
-    if (profileError) {
-      setError('プロフィールの作成に失敗しました')
+    // メール確認が必要な場合（セッションがない）
+    if (!data.session) {
+      setError('確認メールを送信しました。メールを確認してからログインしてください。')
       setLoading(false)
       return
     }

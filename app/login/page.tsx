@@ -21,7 +21,13 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setError('メールアドレスまたはパスワードが正しくありません')
+      if (error.message?.includes('Email not confirmed') || error.message?.includes('email_not_confirmed')) {
+        setError('メールアドレスの確認が完了していません。登録時の確認メールをご確認ください。（Supabaseダッシュボードから手動確認も可能です）')
+      } else if (error.message?.includes('Invalid login credentials') || error.message?.includes('invalid_credentials')) {
+        setError('メールアドレスまたはパスワードが正しくありません')
+      } else {
+        setError(`ログインエラー: ${error.message}`)
+      }
     } else {
       router.push('/discover')
       router.refresh()
