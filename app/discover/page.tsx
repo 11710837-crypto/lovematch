@@ -100,14 +100,12 @@ export default function DiscoverPage() {
       .from('profiles').select('looking_for, gender').eq('id', user.id).single()
     if (!myProfile) { setLoading(false); return }
 
-    const [{ data: likedData }, { data: blockedData }] = await Promise.all([
-      supabase.from('likes').select('to_user_id').eq('from_user_id', user.id),
-      supabase.from('blocks').select('blocked_id').eq('blocker_id', user.id).catch(() => ({ data: [] })),
-    ])
+    const { data: likedData } = await supabase.from('likes').select('to_user_id').eq('from_user_id', user.id)
+    const { data: blockedData } = await supabase.from('blocks').select('blocked_id').eq('blocker_id', user.id)
 
     const excludeIds = [
       ...(likedData?.map((l: { to_user_id: string }) => l.to_user_id) || []),
-      ...((blockedData as { blocked_id: string }[] | null)?.map(b => b.blocked_id) || []),
+      ...(blockedData?.map((b: { blocked_id: string }) => b.blocked_id) || []),
     ]
 
     const minAge = filters?.ageMin ?? ageMin
@@ -149,7 +147,7 @@ export default function DiscoverPage() {
       await supabase.from('footprints').insert({
         visitor_id: myId,
         visited_id: profiles[currentIndex].id,
-      }).catch(() => {})
+      })
     }
     recordFootprint()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,7 +197,7 @@ export default function DiscoverPage() {
     await supabase.from('blocks').insert({
       blocker_id: myId,
       blocked_id: profiles[currentIndex].id,
-    }).catch(() => {})
+    })
     setShowDetail(false)
     setCurrentIndex(p => p + 1)
   }
@@ -210,7 +208,7 @@ export default function DiscoverPage() {
       reporter_id: myId,
       reported_id: profiles[currentIndex].id,
       reason: reportReason,
-    }).catch(() => {})
+    })
     setShowReport(false)
     setReportReason('')
     setCurrentIndex(p => p + 1)
