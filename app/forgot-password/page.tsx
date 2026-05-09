@@ -21,7 +21,11 @@ export default function ForgotPasswordPage() {
     })
 
     if (error) {
-      setError(`エラー: ${error.message}`)
+      if (error.status === 429 || error.message?.includes('security purposes') || error.message?.includes('rate limit')) {
+        setError('送信回数の上限です。60秒以上待ってから再試行してください。')
+      } else {
+        setError('送信に失敗しました。しばらくしてから再試行してください。')
+      }
     } else {
       setSent(true)
     }
